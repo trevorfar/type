@@ -36,118 +36,31 @@ const benchmarkFor = React.useCallback((letter: string) => {
   // ===================== Typing Test =====================
   const [wordCount, setWordCount] = useState<number>(50); // default 50
   const TARGET_LINE_HEIGHT_REM = 2.0;
+      const [dictionary, setDictionary] = useState<string[]>([]);
 
-  const dictionary = useMemo(
-    () => [
-      "the",
-      "of",
-      "and",
-      "to",
-      "in",
-      "is",
-      "you",
-      "that",
-      "it",
-      "he",
-      "was",
-      "for",
-      "on",
-      "are",
-      "as",
-      "with",
-      "his",
-      "they",
-      "i",
-      "at",
-      "be",
-      "this",
-      "have",
-      "from",
-      "or",
-      "one",
-      "had",
-      "by",
-      "word",
-      "but",
-      "not",
-      "what",
-      "all",
-      "were",
-      "we",
-      "when",
-      "your",
-      "can",
-      "there",
-      "use",
-      "an",
-      "each",
-      "which",
-      "she",
-      "do",
-      "how",
-      "their",
-      "if",
-      "will",
-      "up",
-      "other",
-      "about",
-      "out",
-      "many",
-      "then",
-      "them",
-      "these",
-      "so",
-      "some",
-      "her",
-      "would",
-      "make",
-      "like",
-      "him",
-      "into",
-      "time",
-      "has",
-      "look",
-      "two",
-      "more",
-      "write",
-      "go",
-      "see",
-      "number",
-      "no",
-      "way",
-      "could",
-      "people",
-      "my",
-      "than",
-      "first",
-      "water",
-      "been",
-      "call",
-      "who",
-      "oil",
-      "its",
-      "now",
-      "find",
-      "long",
-      "down",
-      "day",
-      "did",
-      "get",
-      "come",
-      "made",
-      "may",
-      "part",
-    ],
-    []
-  );
+      // load /public/words.txt
+      useEffect(() => {
+        fetch("/words.txt")
+          .then((res) => res.text())
+          .then((text) => {
+            // split on whitespace, filter out blanks
+            const words = text
+              .split(/\s+/)
+              .map((w) => w.trim().toLowerCase())
+              .filter(Boolean);
+            setDictionary(words);
+          })
+          .catch((err) => console.error("Failed to load words.txt:", err));
+      }, []);  
 
-  const makeText = useCallback(() => {
-    const words: string[] = [];
-    for (let i = 0; i < wordCount; i++) {
-      words.push(dictionary[Math.floor(Math.random() * dictionary.length)]);
-    }
-    return words.join(" ") + " "; // trailing space for predictable flow
-  }, [wordCount, dictionary]);
+ const makeText = useCallback(() => {
+  if (dictionary.length === 0) return ""; // nothing yet
+  const words: string[] = [];
+  for (let i = 0; i < wordCount; i++) {
+    words.push(dictionary[Math.floor(Math.random() * dictionary.length)]);
+  }
+  return words.join(" ") + " ";
+}, [wordCount, dictionary]);
 
   const [text, setText] = useState("");
   const [cursor, setCursor] = useState(0);
